@@ -57,24 +57,32 @@ class TranscriptParserService {
    * Extracts tasks using Google's Gemini AI
    */
   private async extractTasksWithGemini(transcript: string): Promise<ParsedTask[]> {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
     
-    const prompt = `Extract action items and tasks from the following meeting transcript. 
+    const prompt = `Extract action items and tasks from the following meeting transcript.
+
     For each task, identify:
-    1. Task description/title
-    2. Assignee (who is responsible)
-    3. Due date (if mentioned, or use a reasonable default)
-    4. Priority (P1-Critical, P2-High, P3-Medium, P4-Low)
+    1. Task title (short and clear)
+    2. Description (expand on the task and clarify what needs to be done)
+    3. Assignee (who is responsible)
+    4. Due date (if mentioned, or use a reasonable default)
+    5. Priority (P1-Critical, P2-High, P3-Medium, P4-Low) — default priority is P3
     
     Format the response as a JSON array of objects with these fields:
     [
       {
-        "title": "task description",
+        "title": "short task title",
+        "description": "clear explanation of the task",
         "assignee": "person responsible",
         "due_date": "YYYY-MM-DD",
         "priority": "P1"
       }
     ]
+    
+    Important instructions:
+    - Resolve any relative date references like "tonight", "yesterday", "tomorrow", "Wednesday", etc., using the reference date: 2025-05-30 (i.e., today).
+    - Do not guess or make up dates if not explicitly mentioned or implied.
+    - Ensure all due dates are in YYYY-MM-DD format.
     
     Transcript: ${transcript.substring(0, 30000)}`;
     
