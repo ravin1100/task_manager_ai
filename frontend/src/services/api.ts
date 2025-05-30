@@ -87,7 +87,10 @@ export const taskApi = {
   // Create a task from natural language text
   createTaskFromText: async (text: string): Promise<Task> => {
     try {
-      const response = await api.post('/tasks', { text });
+      const response = await api.post('/tasks', { 
+        text,
+        type: 'transcript' // Ensure tasks created from natural language are marked as transcript type
+      });
       return response.data;
     } catch (error) {
       console.error('Error creating task from text:', error);

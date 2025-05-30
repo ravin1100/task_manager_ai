@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Tab } from '@headlessui/react';
-import { FaPlus, FaFilter, FaSearch } from 'react-icons/fa';
+import { Tab, Dialog } from '@headlessui/react';
+import { FaPlus, FaFilter, FaSearch, FaKeyboard, FaLanguage, FaTimes } from 'react-icons/fa';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import TaskCard from '../components/tasks/TaskCard';
 import TaskForm from '../components/tasks/TaskForm';
 import TranscriptForm from '../components/tasks/TranscriptForm';
+import NaturalLanguageTaskForm from '../components/tasks/NaturalLanguageTaskForm';
 import { taskApi } from '../services/api';
 import type { Task } from '../types';
 
@@ -19,7 +20,9 @@ const TasksPage: React.FC = () => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isTranscriptFormOpen, setIsTranscriptFormOpen] = useState(false);
+  const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
+  const [taskCreationType, setTaskCreationType] = useState<'manual' | 'natural'>('manual');
 
   // Fetch tasks
   useEffect(() => {
@@ -149,21 +152,99 @@ const TasksPage: React.FC = () => {
           <Button 
             variant="primary" 
             icon={<FaPlus />} 
-            onClick={() => {
-              setSelectedTask(null);
-              setIsFormOpen(true);
-            }}
+            onClick={() => setIsNewTaskModalOpen(true)}
           >
             New Task
           </Button>
-          <Button 
-            variant="secondary" 
-            onClick={() => setIsTranscriptFormOpen(true)}
-          >
-            Process Transcript
-          </Button>
         </div>
       </div>
+
+      {/* New Task Modal */}
+      <Dialog open={isNewTaskModalOpen} onClose={() => setIsNewTaskModalOpen(false)} className="relative z-50">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <Dialog.Panel className="w-full max-w-2xl rounded-2xl bg-white dark:bg-gray-800 p-6">
+            <div className="flex justify-between items-center mb-4">
+              <Dialog.Title className="text-xl font-semibold text-gray-900 dark:text-white">
+                Create New Task
+              </Dialog.Title>
+              <button
+                onClick={() => setIsNewTaskModalOpen(false)}
+                className="text-gray-400 hover:text-gray-500 dark:text-gray-300 dark:hover:text-gray-200"
+              >
+                <span className="sr-only">Close</span>
+                <FaTimes className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  type="button"
+                  onClick={() => setTaskCreationType('manual')}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    taskCreationType === 'manual'
+                      ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700'
+                  }`}
+                >
+                  <div className="flex flex-col items-center space-y-2">
+                    <FaKeyboard className={`h-6 w-6 ${
+                      taskCreationType === 'manual' 
+                        ? 'text-primary-600 dark:text-primary-400' 
+                        : 'text-gray-500 dark:text-gray-400'
+                    }`} />
+                    <span className="font-medium text-gray-900 dark:text-white">Manual Entry</span>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 text-center">Fill out all task details</p>
+                  </div>
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={() => setTaskCreationType('natural')}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    taskCreationType === 'natural'
+                      ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700'
+                  }`}
+                >
+                  <div className="flex flex-col items-center space-y-2">
+                    <FaLanguage className={`h-6 w-6 ${
+                      taskCreationType === 'natural' 
+                        ? 'text-primary-600 dark:text-primary-400' 
+                        : 'text-gray-500 dark:text-gray-400'
+                    }`} />
+                    <span className="font-medium text-gray-900 dark:text-white">Natural Language</span>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 text-center">Describe your task in plain English</p>
+                  </div>
+                </button>
+              </div>
+
+              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                {taskCreationType === 'manual' ? (
+                  <TaskForm
+                    onSubmit={async (task) => {
+                      await handleCreateTask(task);
+                      setIsNewTaskModalOpen(false);
+                    }}
+                    onCancel={() => setIsNewTaskModalOpen(false)}
+                    isLoading={isSubmitting}
+                  />
+                ) : (
+                  <NaturalLanguageTaskForm
+                    onSubmit={() => {
+                      setIsNewTaskModalOpen(false);
+                      fetchTasks();
+                    }}
+                    onCancel={() => setIsNewTaskModalOpen(false)}
+                    isLoading={isSubmitting}
+                  />
+                )}
+              </div>
+            </div>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
 
       {/* Task Tabs */}
       <Tab.Group onChange={handleTabChange}>

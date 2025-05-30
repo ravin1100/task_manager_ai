@@ -23,8 +23,11 @@ A full-stack task management application built with React, TypeScript, Node.js, 
 ### Tasks List
 ![Tasks List](/frontend/assets/tasks.png)
 
-### Create Task
-![Create Task](/frontend/assets/create_task.png)
+### Create Task(Manually)
+![Create Task](/frontend/assets/create_task_manual.png)
+
+### Create Task(Natural Language)
+![Create Task](/frontend/assets/create_task_nlp.png)
 
 ### Process Transcript
 ![Transcript Task](/frontend/assets/process_transcript.png)
