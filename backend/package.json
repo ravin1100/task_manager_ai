@@ -1,0 +1,38 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "dist/server.js",
+  "scripts": {
+    "start": "node dist/server.js",
+    "dev": "nodemon --exec ts-node src/server.ts",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:create": "node -e \"require('dotenv').config(); const { exec } = require('child_process'); const { DB_USER, DB_PASSWORD, DB_NAME } = process.env; exec(`createdb -U ${DB_USER} ${DB_NAME}`, (err) => { if (err) console.error('Error creating database:', err.message); else console.log('Database created successfully'); });\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Natural Language Task Manager API",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "chrono-node": "^2.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "morgan": "^1.10.0",
+    "pg": "^8.16.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.18",
+    "@types/express": "^5.0.2",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^22.15.24",
+    "@types/pg": "^8.15.2",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
